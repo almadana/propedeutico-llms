@@ -7,7 +7,7 @@ Sitio introductorio, interactivo y sin backend para las dos semanas previas a la
 Requiere Node.js 22 o posterior.
 
 ```bash
-npm ci
+npm install
 npm run dev
 ```
 
