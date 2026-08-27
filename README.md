@@ -1,6 +1,6 @@
 # Propedéutico LLM — Escuela CICADA
 
-Sitio introductorio, interactivo y sin backend para las dos semanas previas a la Escuela CICADA. Incluye seis jornadas, videos de 3Blue1Brown, actividades breves, glosario y progreso guardado localmente en el navegador.
+Sitio introductorio, interactivo y sin backend para las dos semanas previas a la Escuela CICADA. Incluye seis jornadas obligatorias, dos bloques opcionales sobre redes neuronales, videos de 3Blue1Brown, actividades breves, glosario y progreso guardado localmente en el navegador.
 
 ## Desarrollo local
 
