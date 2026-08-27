@@ -14,6 +14,11 @@ const modules: Module[] = [
   { id: "m6", day: "Día 12", week: "Semana 2", time: "55 min", title: "Integración", summary: "Unir las piezas y llegar a la Escuela." },
 ];
 
+const optionalModules: Module[] = [
+  { id: "n1", day: "A tu ritmo", week: "Base opcional", time: "30 min", title: "¿Qué es una red neuronal?", summary: "Neuronas, capas, pesos y activaciones." },
+  { id: "n2", day: "Después de n1", week: "Base opcional", time: "30 min", title: "¿Cómo aprende una red?", summary: "Error, gradiente y ajuste de parámetros." },
+];
+
 const nextTokens = [
   { word: "lenguaje", p: .42 }, { word: "texto", p: .26 }, { word: "mundo", p: .17 },
   { word: "cerebro", p: .10 }, { word: "resto", p: .05 },
@@ -54,7 +59,8 @@ export default function Home() {
   }, []);
   useEffect(() => { if (loaded) localStorage.setItem("cicada-propedeutico-progress", JSON.stringify(done)); }, [done, loaded]);
 
-  const progress = Math.round((done.length / modules.length) * 100);
+  const coreDone = modules.filter((module) => done.includes(module.id)).length;
+  const progress = Math.round((coreDone / modules.length) * 100);
   const tokens = useMemo(() => {
     if (!tokenText) return [];
     return encode(tokenText).map((id) => ({ id, text: decode([id]).replaceAll(" ", "·").replaceAll("\n", "↵") }));
@@ -97,9 +103,33 @@ export default function Home() {
       </section>
 
       <section className="schedule" id="recorrido">
-        <div className="section-heading"><div><p className="eyebrow">Tu recorrido</p><h2>Seis momentos, a tu ritmo</h2></div><div className="progress-block"><div><span>Avance</span><strong>{done.length}/{modules.length}</strong></div><div className="progress-track"><i style={{ width: `${progress}%` }} /></div></div></div>
+        <div className="section-heading"><div><p className="eyebrow">Tu recorrido</p><h2>Seis momentos, a tu ritmo</h2></div><div className="progress-block"><div><span>Avance obligatorio</span><strong>{coreDone}/{modules.length}</strong></div><div className="progress-track"><i style={{ width: `${progress}%` }} /></div></div></div>
         <div className="schedule-grid">{modules.map((m, i) => <a className={`schedule-card ${done.includes(m.id) ? "is-done" : ""}`} href={`#${m.id}`} key={m.id}><span className="schedule-number">0{i + 1}</span><div><small>{m.week} · {m.day}</small><h3>{m.title}</h3><p>{m.summary}</p></div><span className="schedule-time">{m.time}</span></a>)}</div>
       </section>
+
+      <section className="optional-path" id="base-opcional">
+        <div><p className="eyebrow">Antes del recorrido · opcional</p><h2>¿Las redes neuronales todavía te resultan una caja negra?</h2><p>Estos dos bloques construyen la base sobre la que funcionan los transformers. Hacelos si venís de un área alejada del aprendizaje automático; si estos conceptos ya te resultan familiares, podés ir directamente al recorrido obligatorio.</p></div>
+        <div className="optional-path-actions"><a className="button primary" href="#n1">Hacer la base opcional ↓</a><a className="button quiet" href="#m1">Ir al recorrido obligatorio</a></div>
+        <div className="optional-path-grid">{optionalModules.map((module, index) => <a href={`#${module.id}`} key={module.id}><span>0{index + 1}</span><div><small>{module.time}</small><h3>{module.title}</h3><p>{module.summary}</p></div>{done.includes(module.id) && <b>✓</b>}</a>)}</div>
+      </section>
+
+      <ModuleShell module={optionalModules[0]} done={done.includes("n1")} onDone={() => toggleDone("n1")} optional optionalLabel="Base opcional">
+        <Prompt>Antes de mirar</Prompt><h3>Una red neuronal no es una pequeña réplica del cerebro.</h3><p className="module-intro">Pensala como una función con muchos valores ajustables. Recibe números, los transforma capa por capa y produce otros números.</p>
+        <Video id="aircAruvnKk" title="But what is a neural network? | Deep Learning Chapter 1" label="Fundamento opcional" />
+        <Prompt>Seguí la señal</Prompt>
+        <div className="neuron-flow"><div><span>01</span><h3>Entradas</h3><p>Características representadas como números.</p></div><b>→</b><div><span>02</span><h3>Pesos y sesgo</h3><p>Determinan cuánto influye cada entrada.</p></div><b>→</b><div><span>03</span><h3>Activación</h3><p>Introduce una transformación no lineal.</p></div><b>→</b><div><span>04</span><h3>Salida</h3><p>Una nueva representación o predicción.</p></div></div>
+        <div className="pause-card foundation-note"><strong>Mientras mirás</strong><p>Quedate con la arquitectura general: capas de vectores conectadas por matrices de pesos y funciones no lineales. Los “dibujitos de neuronas” son una forma visual de representar operaciones matemáticas.</p></div>
+        <Takeaway>Una red neuronal es una función parametrizada, organizada en capas, que aprende transformaciones útiles a partir de datos.</Takeaway>
+      </ModuleShell>
+
+      <ModuleShell module={optionalModules[1]} done={done.includes("n2")} onDone={() => toggleDone("n2")} optional optionalLabel="Base opcional">
+        <Prompt>Pregunta guía</Prompt><h3>Si una red se equivoca, ¿cómo sabe qué parámetros cambiar?</h3><p className="module-intro">Necesita una medida del error y una dirección que indique qué pequeños cambios lo reducen.</p>
+        <Video id="IHZwWFHWa-w" title="Gradient descent, how neural networks learn | Deep Learning Chapter 2" label="Fundamento opcional" />
+        <Prompt>El ciclo de aprendizaje</Prompt>
+        <div className="training-cycle"><div><span>1</span><strong>Predecir</strong><p>La red procesa un ejemplo.</p></div><div><span>2</span><strong>Medir el error</strong><p>La función de pérdida compara predicción y objetivo.</p></div><div><span>3</span><strong>Calcular la pendiente</strong><p>El gradiente indica cómo cambia el error.</p></div><div><span>4</span><strong>Ajustar y repetir</strong><p>Los parámetros se mueven en dirección descendente.</p></div></div>
+        <div className="level-note foundation-note"><strong>No hace falta dominar el cálculo</strong><p>Para la Escuela alcanza con esta intuición: el entrenamiento es una búsqueda iterativa en un espacio enorme de parámetros. El gradiente local orienta cada pequeño paso.</p></div>
+        <Takeaway>El descenso por gradiente ajusta los parámetros en la dirección que reduce la función de pérdida; repetir este proceso constituye el núcleo del entrenamiento.</Takeaway>
+      </ModuleShell>
 
       <ModuleShell module={modules[0]} done={done.includes("m1")} onDone={() => toggleDone("m1")}>
         <Prompt>Antes de mirar</Prompt><h3>Terminá mentalmente esta oración:</h3><blockquote>“Un modelo de lenguaje intenta predecir…”</blockquote>
@@ -147,11 +177,11 @@ export default function Home() {
   );
 }
 
-function ModuleShell({ module, done, onDone, optional = false, children }: { module: Module; done: boolean; onDone: () => void; optional?: boolean; children: React.ReactNode }) {
-  return <section className="module" id={module.id}><div className="module-header"><div><p className="eyebrow">{module.week} · {module.day} · {module.time}</p><h2>{module.title}</h2><p>{module.summary}</p></div>{optional && <span className="optional">Profundización</span>}</div><div className="module-body">{children}</div><button className={`complete-button ${done ? "checked" : ""}`} onClick={onDone}><span>{done ? "✓" : ""}</span>{done ? "Módulo completado" : "Marcar como completado"}</button></section>;
+function ModuleShell({ module, done, onDone, optional = false, optionalLabel = "Profundización", children }: { module: Module; done: boolean; onDone: () => void; optional?: boolean; optionalLabel?: string; children: React.ReactNode }) {
+  return <section className={`module ${optionalLabel === "Base opcional" ? "foundation-module" : ""}`} id={module.id}><div className="module-header"><div><p className="eyebrow">{module.week} · {module.day} · {module.time}</p><h2>{module.title}</h2><p>{module.summary}</p></div>{optional && <span className="optional">{optionalLabel}</span>}</div><div className="module-body">{children}</div><button className={`complete-button ${done ? "checked" : ""}`} onClick={onDone}><span>{done ? "✓" : ""}</span>{done ? "Módulo completado" : "Marcar como completado"}</button></section>;
 }
 
-function Video({ id, title }: { id: string; title: string }) { return <div className="video-block"><div className="video-label"><span>▶</span><div><small>Video central</small><strong>{title}</strong></div></div><div className="video-frame"><iframe src={`https://www.youtube-nocookie.com/embed/${id}?rel=0`} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen /></div><a href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noreferrer">Abrir en YouTube ↗</a></div>; }
+function Video({ id, title, label = "Video central" }: { id: string; title: string; label?: string }) { return <div className="video-block"><div className="video-label"><span>▶</span><div><small>{label}</small><strong>{title}</strong></div></div><div className="video-frame"><iframe src={`https://www.youtube-nocookie.com/embed/${id}?rel=0`} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen /></div><a href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noreferrer">Abrir en YouTube ↗</a></div>; }
 function Prompt({ children }: { children: React.ReactNode }) { return <p className="prompt">{children}</p>; }
 function Takeaway({ children }: { children: React.ReactNode }) { return <div className="takeaway"><span>Idea para llevarte</span><p>{children}</p></div>; }
 function QuizQuestion({ id, value, setQuiz, question, options, correct }: { id: string; value?: string; setQuiz: React.Dispatch<React.SetStateAction<Record<string, string>>>; question: string; options: string[]; correct: string }) { return <fieldset><legend>{question}</legend><div>{options.map((o) => <label key={o} className={value === o ? "selected" : ""}><input type="radio" name={id} value={o} checked={value === o} onChange={() => setQuiz((q) => ({ ...q, [id]: o }))} />{o}</label>)}</div>{value && <p className={`feedback ${value === correct ? "good" : "bad"}`}>{value === correct ? "Bien. Esa es la idea central." : "No exactamente. Volvé al mapa del módulo y probá otra vez."}</p>}</fieldset>; }
